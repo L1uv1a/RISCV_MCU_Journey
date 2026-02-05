@@ -1,0 +1,38 @@
+# =========================
+# Vivado generated files
+# =========================
+*.cache/
+*.gen/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+*.str/
+*.xil/
+
+# Logs
+*.jou
+*.log
+*.pb
+*.backup.log
+
+# Build outputs
+*.bit
+*.bin
+*.ltx
+*.dcp
+*.rpt
+
+# Simulation
+*.wdb
+*.wcfg
+*.vcd
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS junk
+Thumbs.db
+desktop.ini
+.DS_Store
