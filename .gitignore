@@ -36,3 +36,32 @@ __pycache__/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# =========================
+# Keep specific Vivado generated IP files
+# =========================
+!RISCV_MCU_Journey.gen/
+!RISCV_MCU_Journey.gen/sources_1/
+!RISCV_MCU_Journey.gen/sources_1/ip/
+
+#### Keep axi_imem_bram_ctrl IP files
+!RISCV_MCU_Journey.gen/sources_1/ip/axi_imem_bram_ctrl/
+*_ooc.xdc
+*_sim_netlist.v
+*_sim_netlist.vhdl
+*_stub.v
+*_stub.vhdl
+*.dcp
+
+#### Keep imem IP files
+!RISCV_MCU_Journey.gen/sources_1/ip/imem/
+*_ooc.xdc
+*_sim_netlist.v
+*_sim_netlist.vhdl
+*_stub.v
+*_stub.vhdl
+*.dcp
+*.mif
+
+# Ensure .gitignore itself is tracked
+!.gitignore

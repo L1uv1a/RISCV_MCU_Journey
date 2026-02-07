@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 02/05/2026 09:53:44 PM
+// Create Date: 02/07/2026 03:07:41 PM
 // Design Name: 
-// Module Name: riscv_core_WB_top
+// Module Name: riscv_core_WBU_top
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module riscv_core_WB_top(
+module riscv_core_WBU_top(
 
     );
 endmodule
