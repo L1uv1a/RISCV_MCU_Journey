@@ -109,7 +109,7 @@ output wire rstb_busy;
 
   blk_mem_gen_v8_4_12 #(
     .C_FAMILY("zynq"),
-    .C_XDEVICEFAMILY("azynq"),
+    .C_XDEVICEFAMILY("zynq"),
     .C_ELABORATION_DIR("./"),
     .C_INTERFACE_TYPE(0),
     .C_AXI_TYPE(1),
