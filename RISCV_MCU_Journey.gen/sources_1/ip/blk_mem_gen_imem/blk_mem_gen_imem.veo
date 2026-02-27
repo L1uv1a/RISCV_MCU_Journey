@@ -63,6 +63,7 @@ blk_mem_gen_imem your_instance_name (
   .dina(dina),            // input wire [31 : 0] dina
   .douta(douta),          // output wire [31 : 0] douta
   .clkb(clkb),            // input wire clkb
+  .rstb(rstb),            // input wire rstb
   .enb(enb),              // input wire enb
   .web(web),              // input wire [3 : 0] web
   .addrb(addrb),          // input wire [31 : 0] addrb

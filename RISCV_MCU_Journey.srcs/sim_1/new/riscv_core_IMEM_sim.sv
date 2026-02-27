@@ -121,7 +121,7 @@ module tb_riscv_core_IMEM();
         // 2. Release Reset
         #(CLK_PERIOD * 10);
         s_axi_aresetn = 1;
-        #(CLK_PERIOD * 5);
+        #(CLK_PERIOD * 10);
 
         $display("--------------------------------------------------");
         $display("Starting IMEM BRAM Read (Instruction Fetch) Test");
@@ -132,7 +132,7 @@ module tb_riscv_core_IMEM();
         for (int i = 0; i < 8; i++) begin
             @(posedge s_axi_aclk);
             imem_bram_en   <= 1;
-            imem_bram_addr <= i; // Word-aligned addresses (0, 4, 8, C...)
+            imem_bram_addr <= i * 4; // Word-aligned addresses (0, 4, 8, C...)
 
             // BRAM Latency:
             // T0: Address is set

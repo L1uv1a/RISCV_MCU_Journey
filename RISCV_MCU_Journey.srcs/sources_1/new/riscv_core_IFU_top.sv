@@ -1,69 +1,92 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
+// Company:
+// Engineer:
+//
 // Create Date: 02/07/2026 03:03:43 PM
-// Design Name: 
+// Design Name:
 // Module Name: riscv_core_IFU_top
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description:
+//
+// Dependencies:
+//
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-// 
+//
 //////////////////////////////////////////////////////////////////////////////////
 
 
 module riscv_core_IFU_top # (
-    localparam PC_RESET = 32'h0000_0000,
+    parameter PC_RESET = 32'h0000_0000,
+    // Parameters for IMEM interfaces
     parameter INSTR_WIDTH = 32,
-    parameter INSTR_ADDR = 32
+    parameter IMEM_ADDR_WIDTH = 32,
+    parameter PC_WIDTH = 32,
+
+    // Parameters for internal IFU signals
+    parameter INSTR_ADDR_WIDTH = 20
 )(
     // Clock and Reset
-    input logic         clk_i,
-    input logic       rst_n_i,
+    input logic       if_clk_i,
+    input logic       if_rst_n_i,
 
     // Instruction Memory Interface
-    output logic [INSTR_ADDR-1:0]   imem_instr_addr_o,
-    input  logic [INSTR_WIDTH-1:0]  imem_instr_data_i,
-    output logic                    imem_instr_req_o,
-    output logic                    imem_instr_rst_i,
+    output logic [IMEM_ADDR_WIDTH-1:0]    imem_instr_addr_o,
+    input  logic [INSTR_WIDTH-1:0]        imem_instr_data_i,
+    output logic                          imem_instr_en_o,
 
     // Control Signals
-    input  logic                    if_stage_stall_i,
+    input  logic                          if_stage_stall_i,
+    input  logic                          if_flush_i,
 
     // Output to the next stage
-    output logic                    instr_valid_id_o,
-    output logic [INSTR_WIDTH-1:0]  instr_data_id_o,
-    output logic [INSTR_ADDR-1:0]   pc
+    output logic                          if_instr_valid_o,
+    output logic [INSTR_WIDTH-1:0]        if_instr_o,
+    output logic [PC_WIDTH-1:0]           if_pc_o,
+    output logic [PC_WIDTH-1:0]           if_next_pc_o
     );
 
-    logic [INSTR_ADDR-1:0]   imem_instr_addr;
-    logic [INSTR_WIDTH-1:0]  imem_instr_data;
-    logic                    imem_instr_req;
-    logic                    imem_instr_rst;
+    logic [INSTR_ADDR_WIDTH-1:0]    current_pc;
+    logic [INSTR_ADDR_WIDTH-1:0]    next_pc;
+    logic [INSTR_ADDR_WIDTH-1:0]    current_pc_reg1;
+    logic [INSTR_ADDR_WIDTH-1:0]    current_pc_reg2;
+    logic [INSTR_WIDTH-1:0]         imem_instr_data;
+
+    logic                           imem_instr_en_reg;
+    logic                           imem_instr_en_reg1;
+    logic                           imem_instr_en_reg2;
 
     always_comb begin
-        pc = instruct_addr_o;
-    end
+        next_pc = current_pc + 2;   // Increment PC by 4 (32 bit instruction) for the next instruction
 
-    always_ff @(posedge clk_i) begin
-        if (!rst_n_i) begin
-            imem_instr_addr  <= PC_RESET;
-            imem_instr_req   <= 1'b0;
-            instr_valid_id   <= 1'b0;
-            instr_data_id    <= '0;
+        imem_instr_addr_o = { {(IMEM_ADDR_WIDTH - INSTR_ADDR_WIDTH - 1){1'b0}}, current_pc, 1'b0 }; // Align to word boundary
+        imem_instr_en_o = imem_instr_en_reg;
+
+        if_instr_valid_o = imem_instr_en_reg2;
+        if_instr_o = imem_instr_data_i;
+        if_pc_o =  { {(IMEM_ADDR_WIDTH - INSTR_ADDR_WIDTH - 1){1'b0}}, current_pc_reg2, 1'b0 };
+        if_next_pc_o = { {(IMEM_ADDR_WIDTH - INSTR_ADDR_WIDTH - 1){1'b0}}, current_pc_reg1, 1'b0 };
+    end
+    always_ff @( posedge if_clk_i or negedge if_rst_n_i ) begin
+        if ( !if_rst_n_i ) begin
+            current_pc <= PC_RESET;
+            current_pc_reg1 <= 0;
+            current_pc_reg2 <= 0;
+            imem_instr_en_reg <= 0;
+            imem_instr_en_reg1 <= 0;
+            imem_instr_en_reg2 <= 0;
         end else begin
-            imem_instr_addr  <= imem_instr_addr + 4;
-            imem_instr_req   <= 1'b1;
-            instr_valid_id   <= instr_valid_id;
-            instr_data_id    <= imem_instr_data;
+            current_pc <= next_pc;
+            current_pc_reg1 <= current_pc;
+            current_pc_reg2 <= current_pc_reg1;
+
+            imem_instr_en_reg <= 1;
+            imem_instr_en_reg1 <= imem_instr_en_reg;
+            imem_instr_en_reg2 <= imem_instr_en_reg1;
         end
     end
 endmodule

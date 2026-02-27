@@ -112,6 +112,7 @@ module riscv_core_IMEM #(
     .douta(bram_rddata_a),
 
     .clkb(imem_bram_clk),
+    .rstb(bram_rst_a),
     .enb(imem_bram_en),
     .web(imem_bram_we),
     .addrb(imem_bram_addr),

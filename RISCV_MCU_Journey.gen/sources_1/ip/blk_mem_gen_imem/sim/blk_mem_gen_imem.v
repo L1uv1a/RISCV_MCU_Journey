@@ -62,6 +62,7 @@ module blk_mem_gen_imem (
   dina,
   douta,
   clkb,
+  rstb,
   enb,
   web,
   addrb,
@@ -91,6 +92,8 @@ output wire [31 : 0] douta;
 (* X_INTERFACE_MODE = "slave" *)
 (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME BRAM_PORTB, MEM_ADDRESS_MODE BYTE_ADDRESS, MEM_SIZE 8192, MEM_WIDTH 32, MEM_ECC NONE, MASTER_TYPE OTHER, READ_LATENCY 1" *)
 input wire clkb;
+(* X_INTERFACE_INFO = "xilinx.com:interface:bram:1.0 BRAM_PORTB RST" *)
+input wire rstb;
 (* X_INTERFACE_INFO = "xilinx.com:interface:bram:1.0 BRAM_PORTB EN" *)
 input wire enb;
 (* X_INTERFACE_INFO = "xilinx.com:interface:bram:1.0 BRAM_PORTB WE" *)
@@ -139,7 +142,7 @@ output wire rstb_busy;
     .C_WRITE_DEPTH_A(8192),
     .C_READ_DEPTH_A(8192),
     .C_ADDRA_WIDTH(32),
-    .C_HAS_RSTB(0),
+    .C_HAS_RSTB(1),
     .C_RST_PRIORITY_B("CE"),
     .C_RSTRAM_B(0),
     .C_INITB_VAL("0"),
@@ -190,7 +193,7 @@ output wire rstb_busy;
     .dina(dina),
     .douta(douta),
     .clkb(clkb),
-    .rstb(1'D0),
+    .rstb(rstb),
     .enb(enb),
     .regceb(1'D1),
     .web(web),

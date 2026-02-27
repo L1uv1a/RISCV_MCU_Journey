@@ -70,6 +70,8 @@ module blk_mem_gen_imem_sv (
   (* X_INTERFACE_IGNORE = "true" *)
   input wire clkb,
   (* X_INTERFACE_IGNORE = "true" *)
+  input wire rstb,
+  (* X_INTERFACE_IGNORE = "true" *)
   input wire enb,
   (* X_INTERFACE_IGNORE = "true" *)
   input wire [3:0] web,
@@ -94,6 +96,7 @@ module blk_mem_gen_imem_sv (
     .dina(dina),
     .douta(douta),
     .clkb(clkb),
+    .rstb(rstb),
     .enb(enb),
     .web(web),
     .addrb(addrb),
