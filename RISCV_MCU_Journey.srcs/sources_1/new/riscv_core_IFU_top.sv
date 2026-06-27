@@ -43,7 +43,7 @@ module riscv_core_IFU_top # (
     input  logic                          if_stage_stall_i,
     input  logic                          if_flush_i,
 
-    // Output to the next stage
+    // Output to the next stage (IDU)
     output logic                          if_instr_valid_o,
     output logic [INSTR_WIDTH-1:0]        if_instr_o,
     output logic [PC_WIDTH-1:0]           if_pc_o,
