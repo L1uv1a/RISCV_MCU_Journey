@@ -19,20 +19,14 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
+import rv32i_instr_pkg::*;
 
 module riscv_core_IFU_top # (
-    parameter PC_RESET = 32'h0000_0000,
-    // Parameters for IMEM interfaces
-    parameter INSTR_WIDTH = 32,
-    parameter IMEM_ADDR_WIDTH = 32,
-    parameter PC_WIDTH = 32,
 
-    // Parameters for internal IFU signals
-    parameter INSTR_ADDR_WIDTH = 20
 )(
     // Clock and Reset
-    input logic       if_clk_i,
-    input logic       if_rst_n_i,
+    input logic       if_sys_clk_i,
+    input logic       if_sys_rst_n_i,
 
     // Instruction Memory Interface
     output logic [IMEM_ADDR_WIDTH-1:0]    imem_instr_addr_o,
@@ -71,8 +65,8 @@ module riscv_core_IFU_top # (
         if_pc_o =  { {(IMEM_ADDR_WIDTH - INSTR_ADDR_WIDTH - 1){1'b0}}, current_pc_reg2, 1'b0 };
         if_next_pc_o = { {(IMEM_ADDR_WIDTH - INSTR_ADDR_WIDTH - 1){1'b0}}, current_pc_reg1, 1'b0 };
     end
-    always_ff @( posedge if_clk_i or negedge if_rst_n_i ) begin
-        if ( !if_rst_n_i ) begin
+    always_ff @( posedge if_sys_clk_i or negedge if_sys_rst_n_i ) begin
+        if ( !if_sys_rst_n_i ) begin
             current_pc <= PC_RESET;
             current_pc_reg1 <= 0;
             current_pc_reg2 <= 0;

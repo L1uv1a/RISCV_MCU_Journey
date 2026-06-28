@@ -22,20 +22,10 @@
 import rv32i_instr_pkg::*;
 
 module riscv_core_IDU_top #(
-    parameter REG_DATA_WIDTH = 32,
-    parameter REG_ADDR_WIDTH = 5,
-    parameter INSTR_DATA_WIDTH = 32,
-    parameter INSTR_ADDR_WIDTH = 32,
-    parameter PC_WIDTH = 32,
-    parameter COMPUTE_ELEMENT_LIST = 3,
-    parameter COMPUTE_ELEMENT_BIT_WIDTH = $clog2(COMPUTE_ELEMENT_LIST),
-    parameter COMPUTE_ELEMENT_SUB_FUNC_CHOICE = 8,
-    parameter COMPUTE_ELEMENT_SUB_FUNC_CHOICE_BIT_WIDTH = $clog2(COMPUTE_ELEMENT_SUB_FUNC_CHOICE),
-    parameter LOAD_STORE_ELEMENT_LIST = 9,
-    parameter LOAD_STORE_ELEMENT_BIT_WIDTH = $clog2(LOAD_STORE_ELEMENT_LIST)
+
 )(
-    input logic       id_clk_i,
-    input logic       id_rst_n_i,
+    input logic       id_sys_clk_i,
+    input logic       id_sys_rst_n_i,
 
     // Input from IFU
     input logic                          id_instr_valid_i,
@@ -56,6 +46,9 @@ module riscv_core_IDU_top #(
     output logic [PC_WIDTH-1:0]                                   id_pc_o,
     output logic [PC_WIDTH-1:0]                                   id_next_pc_o,
 
+    output logic                                                  id_jump_taken_o,
+    output logic                                                  id_branch_detected_o,
+
     // Data from RF
     input logic [REG_DATA_WIDTH-1:0]     id_rs1_data_i,
     input logic [REG_DATA_WIDTH-1:0]     id_rs2_data_i,
@@ -66,60 +59,6 @@ module riscv_core_IDU_top #(
     output logic [REG_ADDR_WIDTH-1:0]    id_rs2_addr_o
     );
 
-    typedef enum logic [COMPUTE_ELEMENT_BIT_WIDTH-1:0] {
-        ADDER, // 0
-        LOGIC,
-        SHIFTER
-        // XOR_GATE, // 1
-        // OR_GATE, // 2
-        // AND_GATE, // 3
-        // COMPARATOR, // 4
-        // LEFT_LOGIC_SHIFTER, // 5
-        // RIGHT_LOGIC_SHIFTER, // 6
-        // RIGHT_ARITHMETIC_SHIFTER // 7
-    } id_compute_sel_enum;
-
-    typedef enum logic [COMPUTE_ELEMENT_SUB_FUNC_CHOICE_BIT_WIDTH-1:0] {
-        ADD,
-        SUB,
-        EQUAL,
-        NOT_EQUAL,
-        LESS_THAN, // <
-        LESS_THAN_UNSIGNED, // <
-        GREATER_THAN, // >=
-        GREATER_THAN_UNSIGNED // >=
-    } id_adder_sub_func_enum;
-
-    typedef enum logic [COMPUTE_ELEMENT_SUB_FUNC_CHOICE_BIT_WIDTH-1:0] {
-        XOR,
-        OR,
-        AND
-    } id_logic_sub_func_enum;
-
-    typedef enum logic [COMPUTE_ELEMENT_SUB_FUNC_CHOICE_BIT_WIDTH-1:0] {
-        LEFT_LOGIC_SHIFT,
-        RIGHT_LOGIC_SHIFT,
-        RIGHT_ARITHMETIC_SHIFT
-    } id_shift_sub_func_enum;
-
-    typedef union packed {
-        logic [COMPUTE_ELEMENT_SUB_FUNC_CHOICE_BIT_WIDTH-1:0] sub_func_sel;
-        id_adder_sub_func_enum adder_choose;
-        id_logic_sub_func_enum logic_choose;
-        id_shift_sub_func_enum shifter_choose;
-    } id_sub_func_sel_enum_t;
-
-    typedef enum logic [LOAD_STORE_ELEMENT_BIT_WIDTH-1:0] {
-        NONE, // 0
-        LOAD_1BYTE, // 1
-        LOAD_2BYTE, // 2
-        LOAD_4BYTE, // 3
-        LOAD_1BYTE_UNSIGNED, // 4
-        LOAD_2BYTE_UNSIGNED, // 5
-        STORE_1BYTE, // 6
-        STORE_2BYTE, // 7
-        STORE_4BYTE // 8
-    } id_load_store_sel_enum;
 
     logic                          id_instr_valid;
     logic                          id_jump_taken;
@@ -542,5 +481,6 @@ module riscv_core_IDU_top #(
     assign id_rd_addr_o             = id_rd_addr;
     assign id_pc_o                  = id_pc;
     assign id_next_pc_o             = id_next_pc;
-
+    assign id_jump_taken_o          = id_jump_taken;
+    assign id_branch_detected_o     = id_branch_detected;
 endmodule

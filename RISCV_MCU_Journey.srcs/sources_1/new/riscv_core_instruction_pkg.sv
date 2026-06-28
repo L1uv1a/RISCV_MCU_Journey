@@ -21,7 +21,25 @@
 
 
 package rv32i_instr_pkg;
-
+    /*------------PARAMETERS FOR RISCV CORE USE------------*/
+    parameter PC_RESET = 32'h0000_0000;
+    // Parameters for IMEM interfaces
+    parameter INSTR_WIDTH = 32;
+    parameter IMEM_ADDR_WIDTH = 32;
+    parameter PC_WIDTH = 32;
+    // Parameters for internal IFU signals
+    parameter INSTR_DATA_WIDTH = 32;
+    parameter INSTR_ADDR_WIDTH = 20;
+    parameter REG_DATA_WIDTH = 32;
+    parameter REG_ADDR_WIDTH = 5;
+    // Parameters for internal IDU and EXU signals
+    parameter COMPUTE_ELEMENT_LIST = 3;
+    parameter COMPUTE_ELEMENT_BIT_WIDTH = $clog2(COMPUTE_ELEMENT_LIST);
+    parameter COMPUTE_ELEMENT_SUB_FUNC_CHOICE = 8;
+    parameter COMPUTE_ELEMENT_SUB_FUNC_CHOICE_BIT_WIDTH = $clog2(COMPUTE_ELEMENT_SUB_FUNC_CHOICE);
+    parameter LOAD_STORE_ELEMENT_LIST = 9;
+    parameter LOAD_STORE_ELEMENT_BIT_WIDTH = $clog2(LOAD_STORE_ELEMENT_LIST);
+    /*------------ENUMERATIONS FOR RISCV FORMAT------------*/
     // RV32I OP code instruction enum
     typedef enum logic [6:0] {
         OP_LUI      = 7'b0110111,
@@ -110,29 +128,29 @@ package rv32i_instr_pkg;
     // R-type instruction format
     typedef struct packed {
         logic [6:0] funct7;
-        logic [4:0] rs2;
-        logic [4:0] rs1;
+        logic [REG_ADDR_WIDTH-1:0] rs2;
+        logic [REG_ADDR_WIDTH-1:0] rs1;
         funct3_imm_enum_t funct3;
-        logic [4:0] rd;
+        logic [REG_ADDR_WIDTH-1:0] rd;
         opcode_enum_t opcode;
     } r_type_instr_t;
 
     // I-type instruction format
     typedef struct packed {
         logic [11:0] imm;
-        logic [4:0] rs1;
+        logic [REG_ADDR_WIDTH-1:0] rs1;
         logic [2:0] funct3;
-        logic [4:0] rd;
+        logic [REG_ADDR_WIDTH-1:0] rd;
         opcode_enum_t opcode;
     } i_type_instr_t;
 
     // S-type instruction format
     typedef struct packed {
         logic [11:5] imm_high;
-        logic [4:0] rs2;
-        logic [4:0] rs1;
+        logic [REG_ADDR_WIDTH-1:0] rs2;
+        logic [REG_ADDR_WIDTH-1:0] rs1;
         logic [2:0] funct3;
-        logic [4:0] imm_low;
+        logic [REG_ADDR_WIDTH-1:0] imm_low;
         opcode_enum_t opcode;
     } s_type_instr_t;
 
@@ -140,8 +158,8 @@ package rv32i_instr_pkg;
     typedef struct packed {
         logic imm_12;
         logic [10:5] imm_10_5;
-        logic [4:0] rs2;
-        logic [4:0] rs1;
+        logic [REG_ADDR_WIDTH-1:0] rs2;
+        logic [REG_ADDR_WIDTH-1:0] rs1;
         logic [2:0] funct3;
         logic [3:0] imm_4_1;
         logic imm_11;
@@ -151,7 +169,7 @@ package rv32i_instr_pkg;
     // U-type instruction format
     typedef struct packed {
         logic [31:12] imm;
-        logic [4:0] rd;
+        logic [REG_ADDR_WIDTH-1:0] rd;
         opcode_enum_t opcode;
     } u_type_instr_t;
 
@@ -161,13 +179,13 @@ package rv32i_instr_pkg;
         logic [10:1] imm_10_1;
         logic imm_11;
         logic [7:0] imm_19_12;
-        logic [4:0] rd;
+        logic [REG_ADDR_WIDTH-1:0] rd;
         opcode_enum_t opcode;
     } j_type_instr_t;
 
     // Union
     typedef union packed {
-        logic [31:0] instr;
+        logic [INSTR_DATA_WIDTH-1:0] instr;
         r_type_instr_t r_type;
         i_type_instr_t i_type;
         s_type_instr_t s_type;
@@ -176,4 +194,59 @@ package rv32i_instr_pkg;
         j_type_instr_t j_type;
     } rv32_instruction_t;
 
+    /*------------ENUMERATIONS AND PARAMETERS FOR INTERNAL CORE USE------------*/
+    typedef enum logic [COMPUTE_ELEMENT_BIT_WIDTH-1:0] {
+        ADDER, // 0
+        LOGIC,
+        SHIFTER
+        // XOR_GATE, // 1
+        // OR_GATE, // 2
+        // AND_GATE, // 3
+        // COMPARATOR, // 4
+        // LEFT_LOGIC_SHIFTER, // 5
+        // RIGHT_LOGIC_SHIFTER, // 6
+        // RIGHT_ARITHMETIC_SHIFTER // 7
+    } id_compute_sel_enum;
+
+    typedef enum logic [COMPUTE_ELEMENT_SUB_FUNC_CHOICE_BIT_WIDTH-1:0] {
+        ADD,
+        SUB,
+        EQUAL,
+        NOT_EQUAL,
+        LESS_THAN, // <
+        LESS_THAN_UNSIGNED, // <
+        GREATER_THAN, // >=
+        GREATER_THAN_UNSIGNED // >=
+    } id_adder_sub_func_enum;
+
+    typedef enum logic [COMPUTE_ELEMENT_SUB_FUNC_CHOICE_BIT_WIDTH-1:0] {
+        XOR,
+        OR,
+        AND
+    } id_logic_sub_func_enum;
+
+    typedef enum logic [COMPUTE_ELEMENT_SUB_FUNC_CHOICE_BIT_WIDTH-1:0] {
+        LEFT_LOGIC_SHIFT,
+        RIGHT_LOGIC_SHIFT,
+        RIGHT_ARITHMETIC_SHIFT
+    } id_shift_sub_func_enum;
+
+    typedef union packed {
+        logic [COMPUTE_ELEMENT_SUB_FUNC_CHOICE_BIT_WIDTH-1:0] sub_func_sel;
+        id_adder_sub_func_enum adder_choose;
+        id_logic_sub_func_enum logic_choose;
+        id_shift_sub_func_enum shifter_choose;
+    } id_sub_func_sel_enum_t;
+
+    typedef enum logic [LOAD_STORE_ELEMENT_BIT_WIDTH-1:0] {
+        NONE, // 0
+        LOAD_1BYTE, // 1
+        LOAD_2BYTE, // 2
+        LOAD_4BYTE, // 3
+        LOAD_1BYTE_UNSIGNED, // 4
+        LOAD_2BYTE_UNSIGNED, // 5
+        STORE_1BYTE, // 6
+        STORE_2BYTE, // 7
+        STORE_4BYTE // 8
+    } id_load_store_sel_enum;
 endpackage
