@@ -39,6 +39,9 @@ package rv32i_instr_pkg;
     parameter COMPUTE_ELEMENT_SUB_FUNC_CHOICE_BIT_WIDTH = $clog2(COMPUTE_ELEMENT_SUB_FUNC_CHOICE);
     parameter LOAD_STORE_ELEMENT_LIST = 9;
     parameter LOAD_STORE_ELEMENT_BIT_WIDTH = $clog2(LOAD_STORE_ELEMENT_LIST);
+
+    parameter AXI4LITE_ADDR_WIDTH = 32;
+    parameter AXI4LITE_DATA_WIDTH = 32;
     /*------------ENUMERATIONS FOR RISCV FORMAT------------*/
     // RV32I OP code instruction enum
     typedef enum logic [6:0] {
