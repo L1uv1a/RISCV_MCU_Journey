@@ -241,15 +241,15 @@ package rv32i_instr_pkg;
         id_shift_sub_func_enum shifter_choose;
     } id_sub_func_sel_enum_t;
 
-    typedef enum logic [LOAD_STORE_ELEMENT_BIT_WIDTH-1:0] {
-        NONE, // 0
-        LOAD_1BYTE, // 1
-        LOAD_2BYTE, // 2
-        LOAD_4BYTE, // 3
-        LOAD_1BYTE_UNSIGNED, // 4
-        LOAD_2BYTE_UNSIGNED, // 5
-        STORE_1BYTE, // 6
-        STORE_2BYTE, // 7
-        STORE_4BYTE // 8
+    typedef enum logic [LOAD_STORE_ELEMENT_BIT_WIDTH-1:0] { // First 2 bit: number of bytes, 3rd bit: signed/unsigned, 4th bit: load/store
+        NONE = 4'b0000,
+        LOAD_1BYTE = 4'b0001,
+        LOAD_2BYTE = 4'b0010,
+        LOAD_4BYTE = 4'b0011,
+        LOAD_1BYTE_UNSIGNED = 4'b0101,
+        LOAD_2BYTE_UNSIGNED = 4'b0110,
+        STORE_1BYTE = 4'b1001,
+        STORE_2BYTE = 4'b1010,
+        STORE_4BYTE = 4'b1011
     } id_load_store_sel_enum;
 endpackage

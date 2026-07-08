@@ -34,8 +34,8 @@ interface axi4lite_interface #(
     //==========================
     // Write Data Channel
     //==========================
-    logic [DATA_WIDTH-1:0]   WDATA;
-    logic [DATA_WIDTH/8-1:0] WSTRB;
+    logic [AXI4LITE_DATA_WIDTH-1:0]   WDATA;
+    logic [AXI4LITE_DATA_WIDTH/8-1:0] WSTRB;
     logic                    WVALID;
     logic                    WREADY;
 
@@ -57,7 +57,7 @@ interface axi4lite_interface #(
     //==========================
     // Read Data Channel
     //==========================
-    logic [DATA_WIDTH-1:0] RDATA;
+    logic [AXI4LITE_DATA_WIDTH-1:0] RDATA;
     logic [1:0]            RRESP;
     logic                  RVALID;
     logic                  RREADY;
